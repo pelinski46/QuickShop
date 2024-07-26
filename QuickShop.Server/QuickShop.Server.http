@@ -1,0 +1,6 @@
+@QuickShop.Server_HostAddress = http://localhost:5120
+
+GET {{QuickShop.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

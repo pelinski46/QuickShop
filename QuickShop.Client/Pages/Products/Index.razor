@@ -1,0 +1,35 @@
+﻿@page "/products"
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using QuickShop.Shared.Models
+@inject HttpClient Http
+
+<PageTitle>Productos</PageTitle>
+
+<h1>Productos</h1>
+
+<p>
+    <a href="products/create">Crear Nuevo Producto</a>
+</p>
+
+<QuickGrid Class="table" Items="@products" Pagination="pagination">
+    <PropertyColumn Property="product => product.Title" Title="Nombre" />
+    <PropertyColumn Property="product => product.Description" Title="Descripción"/>
+    <PropertyColumn Property="product => product.quantity" Title="Cantidad" />
+    <PropertyColumn Property="product => product.Price" Title="Precio" />
+    <TemplateColumn Context="product">
+        <a href="@Edit.Url(product)">Editar</a> |
+        <a href="@Details.Url(product)">Detalles</a> |
+        <a href="@Delete.Url(product)">Eliminar</a>
+    </TemplateColumn>
+</QuickGrid>
+
+<Paginator State="pagination" />
+
+@code {
+    IQueryable<Product>? products;
+    protected override async Task OnInitializedAsync()
+    {
+        products = Queryable.AsQueryable( await Http.GetFromJsonAsync<List<Product>>("api/Products"));
+    }
+    PaginationState pagination = new() { ItemsPerPage = 10 };
+}

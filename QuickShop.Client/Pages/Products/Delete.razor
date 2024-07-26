@@ -1,0 +1,73 @@
+﻿@page "/products/delete/{id:int}"
+@using QuickShop.Shared.Models
+@inject HttpClient Http
+@inject NavigationManager navigationManager
+
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Eliminar Producto</h1>
+
+<h3>Estas seguro que deseas eliminar?</h3>
+<div>
+    <h4>Productos</h4>
+    <hr />
+    @if (product is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <dl class="row">
+            <dt class="col-sm-2">Nombre</dt>
+            <dd class="col-sm-10">@product.Title</dd>
+            <dt class="col-sm-2">Description</dt>
+            <dd class="col-sm-10">@product.Description</dd>
+            <dt class="col-sm-2">Cantidad</dt>
+            <dd class="col-sm-10">@product.quantity</dd>
+            <dt class="col-sm-2">Precio</dt>
+            <dd class="col-sm-10">@product.Price</dd>
+        </dl>
+
+        <EditForm method="post" Model="product" OnValidSubmit="DeleteProduct" FormName="delete">
+            <button type="submit" class="btn btn-danger" disabled="@(product is null)">Eliminar</button> |
+            <a href="products">Vuelta a la lista</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    public static string Url(Product product) =>
+            $"products/delete/{Uri.EscapeDataString(product.Id.ToString())}";
+
+    Product? product;
+
+    
+
+    protected override async Task OnInitializedAsync()
+    {
+        product = await Http.GetFromJsonAsync<Product>($"api/Products/{Id}");
+
+        if (product is null)
+        {
+            navigationManager.NavigateTo("notfound");
+        }
+    }
+
+    public async Task DeleteProduct()
+    {
+        var response = await Http.DeleteAsync($"api/Products/{Id}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            navigationManager.NavigateTo("/products");
+        }
+        else
+        {
+            // Handle error
+            Console.WriteLine("Error deleting the product");
+        }
+    }
+}

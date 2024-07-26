@@ -1,0 +1,73 @@
+﻿@page "/products/create"
+@using QuickShop.Shared.Models
+@inject HttpClient http
+@inject NavigationManager navigationManager
+<PageTitle>Add Product</PageTitle>
+
+<PageTitle>Create</PageTitle>
+
+<h1>Crear Productos</h1>
+
+@if (product is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <hr />
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="product" OnValidSubmit="AddProduct" FormName ="create">
+                <DataAnnotationsValidator />
+                <ValidationSummary class="text-danger" />
+                <div class="mb-3">
+                    <label for="title" class="form-label">Title:</label>
+                    <InputText id="title" @bind-Value=product.Title class="form-control" />
+                    <ValidationMessage For="() => product.Title" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description:</label>
+                    <InputText id="description" @bind-Value="product.Description" class="form-control" />
+                    <ValidationMessage For="() => product.Description" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="quantity" class="form-label">Quantity:</label>
+                    <InputNumber id="quantity" @bind-Value="product.quantity" class="form-control" />
+                    <ValidationMessage For="() => product.quantity" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="price" class="form-label">Price:</label>
+                    <InputNumber id="price" @bind-Value="product.Price" min="0" step="0.01" class="form-control" />
+                    <ValidationMessage For="() => product.Price" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Create</button>
+            </EditForm>
+        </div>
+    </div>
+}
+<div>
+    <a href="products">Lista de Productos</a>
+</div>
+
+
+
+@code {
+
+    public Product product { get; set; } = new();
+
+
+
+    private async void AddProduct()
+    {
+        var response = await http.PostAsJsonAsync("api/Products", product);
+        if (response.IsSuccessStatusCode)
+        {
+            // Handle successful product creation, e.g., navigate to a different page or show a success message
+            navigationManager.NavigateTo("products");
+        }
+        else
+        {
+            // Handle error, e.g., show an error message
+        }
+    }
+}

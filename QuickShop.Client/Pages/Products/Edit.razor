@@ -1,0 +1,90 @@
+﻿@page "/products/edit/{id:int}"
+@using QuickShop.Shared.Models
+@inject HttpClient Http
+@inject NavigationManager navigationManager
+<PageTitle>Add Product</PageTitle>
+
+<PageTitle>Create</PageTitle>
+
+<h1>Editar Producto</h1>
+
+<hr />
+
+@if (product is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="product" OnValidSubmit="UpdateProduct" FormName ="create">
+                <DataAnnotationsValidator />
+                <ValidationSummary class="text-danger" />
+                <div class="mb-3">
+                    <label for="title" class="form-label">Title:</label>
+                    <InputText id="title" @bind-Value=product.Title class="form-control" />
+                    <ValidationMessage For="() => product.Title" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description:</label>
+                    <InputText id="description" @bind-Value="product.Description" class="form-control" />
+                    <ValidationMessage For="() => product.Description" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="quantity" class="form-label">Quantity:</label>
+                    <InputNumber id="quantity" @bind-Value="product.quantity" class="form-control" />
+                    <ValidationMessage For="() => product.quantity" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="price" class="form-label">Price:</label>
+                    <InputNumber id="price" @bind-Value="product.Price" min="0" step="0.01" class="form-control" />
+                    <ValidationMessage For="() => product.Price" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </EditForm>
+        </div>
+    </div>
+}
+<div>
+    <a href="products">Lista de Productos</a>
+</div>
+
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    public static string Url(Product product) =>
+            $"products/edit/{Uri.EscapeDataString(product.Id.ToString())}";
+
+    public Product? product { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        product = await Http.GetFromJsonAsync<Product>($"api/Products/{Id}");
+
+        if (product is null)
+        {
+            navigationManager.NavigateTo("notfound");
+        }
+    }
+
+ 
+    private async void UpdateProduct()
+    {
+        var response = await Http.DeleteAsync($"api/Products/{Id}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            navigationManager.NavigateTo("/products");
+        }
+        else
+        {
+            // Handle error
+            Console.WriteLine("Error deleting the product");
+        }
+    }
+}
