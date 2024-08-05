@@ -2,39 +2,30 @@
 @using QuickShop.Shared.Models
 @inject HttpClient Http
 @inject NavigationManager navigationManager
+@inject IProductService ProductService
+
+<PageTitle>Detalles del Producto</PageTitle>
 
 
-<PageTitle>Delete</PageTitle>
-
-<h1>Eliminar Producto</h1>
-
-<h3>Estas seguro que deseas eliminar?</h3>
-<div>
-    <h4>Productos</h4>
-    <hr />
+<FluentStack Orientation="Orientation.Vertical">
     @if (product is null)
     {
-        <p><em>Loading...</em></p>
+        <FluentProgressRing Size="Large" />
     }
     else
     {
-        <dl class="row">
-            <dt class="col-sm-2">Nombre</dt>
-            <dd class="col-sm-10">@product.Title</dd>
-            <dt class="col-sm-2">Description</dt>
-            <dd class="col-sm-10">@product.Description</dd>
-            <dt class="col-sm-2">Cantidad</dt>
-            <dd class="col-sm-10">@product.quantity</dd>
-            <dt class="col-sm-2">Precio</dt>
-            <dd class="col-sm-10">@product.Price</dd>
-        </dl>
-
-        <div>
-            <a href="@Edit.Url(product)">Edit</a> |
-            <a href="products">Lista de productos</a>
-        </div>
+        <FluentStack Orientation="Orientation.Vertical">
+            <h4>@product.Title</h4>
+            <img src="@product.Image" width="200" height="300" class="img-fluid" style="object-fit: cover;" />
+            <FluentTextArea Label="Descripción" Value="@product.Description" ReadOnly Style="background-color:transparent"/>
+            <FluentTextField Label="Cantidad" Value="@product.quantity.ToString()" ReadOnly />
+            <FluentTextField Label="Precio" Value="@product.Price.ToString("C", new System.Globalization.CultureInfo("es-AR"))" ReadOnly />
+        </FluentStack>
     }
-</div>
+    <FluentButton Appearance="Appearance.Accent">Comprar</FluentButton>
+    <FluentButton Appearance="Appearance.Accent">Agregar al Carrito</FluentButton>
+</FluentStack>
+
 
 @code {
     [Parameter]
@@ -49,7 +40,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        product = await Http.GetFromJsonAsync<Product>($"api/Products/{Id}");
+        product = await ProductService.GetProduct(Id);
 
         if (product is null)
         {

@@ -2,6 +2,7 @@
 @using QuickShop.Shared.Models
 @inject HttpClient http
 @inject NavigationManager navigationManager
+@using QuickShop.Client.Imagehelper
 <PageTitle>Add Product</PageTitle>
 
 <PageTitle>Create</PageTitle>
@@ -40,8 +41,25 @@ else
                     <InputNumber id="price" @bind-Value="product.Price" min="0" step="0.01" class="form-control" />
                     <ValidationMessage For="() => product.Price" class="text-danger" />
                 </div>
-                <button type="submit" class="btn btn-primary">Create</button>
+                <div class ="mb-3">
+                    <label for="category">Categoria</label>
+                    <InputSelect id="category" @bind-Value="product.CategoryId" class="form-control">
+                        @foreach (var category in Categories)
+                        {
+                            <option value="@category.Id">@category.Name</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => product.CategoryId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="imageUpload" class="form-label @(ImageUploadMessage == ""?"":"text-danger")">
+                        @(ImageUploadMessage == "" ? "Upload Image" : ImageUploadMessage )
+                    </label>
+                    <InputFile id="imageUpload" OnChange="HandleImageUpload" class="form-control" multiple ></InputFile>
+                </div>
+                <button type="submit" class="btn btn-primary">Crear Producto</button>
             </EditForm>
+            <FluentButton OnClick="CreateFakeAsync"></FluentButton>
         </div>
     </div>
 }
@@ -54,20 +72,37 @@ else
 @code {
 
     public Product product { get; set; } = new();
+    public List<Category> Categories {get; set;} = new();
+    ImageHelper imageHelper = new();
+    string ImageUploadMessage = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        Categories = await http.GetFromJsonAsync<List<Category>>("api/Categories");
 
 
+    }
 
-    private async void AddProduct()
+    
+
+    async Task AddProduct()
     {
         var response = await http.PostAsJsonAsync("api/Products", product);
         if (response.IsSuccessStatusCode)
         {
-            // Handle successful product creation, e.g., navigate to a different page or show a success message
+
+
             navigationManager.NavigateTo("products");
         }
         else
         {
-            // Handle error, e.g., show an error message
+            // Handle error
         }
     }
+    async Task HandleImageUpload(InputFileChangeEventArgs e)
+    {
+        await imageHelper.HandleImageUpload(e, ImageUploadMessage, product);
+    }
+    
 }
+

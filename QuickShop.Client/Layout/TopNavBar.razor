@@ -1,15 +1,15 @@
+@inject NavigationManager navigationManager
+
+
 <div class="container">
     <header class="d-flex justify-content-between flex-wrap py-3">
-        <NavLink href="/" class="text-light text-decoration-none fs-4 fw-bold">QuickShop</NavLink>
+        <NavLink href="/" class="text-light text-decoration-none fs-4 fw-bold">Urban Indumentaria</NavLink>
         <ul class="nav">
             <li>
-                <NavLink href="/" class="link-light nav-link">Home</NavLink>
-            </li>
+                <NavLink href="/" class="link-light nav-link">Inicio</NavLink>
+            </li>  
             <li>
-                <NavLink href="/store" class="link-light nav-link">Tienda</NavLink>
-            </li>   
-            <li>
-                <NavLink href="/products" class="link-light nav-link">Productos</NavLink>
+                <NavLink href="/store" class="link-light nav-link">Productos</NavLink>
             </li>
             <li>
                 <NavLink href="/products" class="link-light nav-link">Oferta</NavLink>
@@ -17,10 +17,25 @@
             
         </ul>   
         <div class="text-end">
-            <NavLink href="/cart" class="btn btn-primary">Carrito</NavLink>
+            <FluentButton IconStart="@(new Icons.Regular.Size20.Cart())" Appearance="Appearance.Accent" BackgroundColor="#0584f7" Style=" padding: 5px; height: 35px">Carrito</FluentButton>
+            <FluentButton IconStart="@(new Icons.Regular.Size20.Person())" Appearance="Appearance.Accent" BackgroundColor="#0584f7" Style="padding: 5px; height: 34px" OnClick="GoToLogIn">Iniciar Sesión</FluentButton>
+            <FluentButton IconStart="@(new Icons.Regular.Size20.PersonAdd())" Appearance="Appearance.Accent" BackgroundColor="#0584f7" Style="padding: 5px;height: 34px" OnClick="GoToRegister">Registrarse</FluentButton>
         </div>
     </header>
 </div>
 @code {
+
+    public void GoToCart()
+    {
+        navigationManager.NavigateTo("/cart");
+    }
+    public void GoToLogIn()
+    {
+        navigationManager.NavigateTo("/login");
+    }
+    public void GoToRegister()
+    {
+        navigationManager.NavigateTo("/register");
+    }
 
 }

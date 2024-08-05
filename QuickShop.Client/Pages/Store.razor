@@ -1,0 +1,48 @@
+﻿@page "/store"
+@inject HttpClient http
+@inject IProductService ProductService
+<div class="container-fluid">
+    <div class="row">
+        <FluentCard Style="width: 20%;">
+            <CategoriesPage CategoryClickedEvent="CategoryClickedEvent" DefaultCategoryClickedEvent="DefaultCategoryClickedEvent" />
+        </FluentCard>
+        <FluentCard Style="width: 78%;">
+            <ProductPage products="productsbycategory?? products" />
+        </FluentCard>
+    </div>
+</div>
+
+
+
+
+@code 
+{
+    public List<Product>? products;
+    public List<Product>? productsbycategory;
+    protected async override Task OnInitializedAsync()
+    {
+        await LoadData();
+    } 
+
+    public async void CategoryClickedEvent(int categoryId)
+    {
+        if (categoryId == 0)
+            return; // Reload all products if no category is selected
+        productsbycategory = await ProductService.GetProductsByCategory(categoryId);
+        StateHasChanged();
+
+    }
+
+    async Task DefaultCategoryClickedEvent()
+    {
+        await LoadData();
+        
+    }
+
+    async Task LoadData()
+    {
+        products = await ProductService.GetProducts();
+        productsbycategory = null; // Clear category-specific products
+        StateHasChanged(); // Trigger a re-render to update the UI
+    }
+}

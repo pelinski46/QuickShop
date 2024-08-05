@@ -1,7 +1,9 @@
 ﻿@page "/products/edit/{id:int}"
+@using QuickShop.Client.Imagehelper
 @using QuickShop.Shared.Models
-@inject HttpClient Http
+@inject HttpClient http
 @inject NavigationManager navigationManager
+@inject IProductService ProductService
 <PageTitle>Add Product</PageTitle>
 
 <PageTitle>Create</PageTitle>
@@ -42,6 +44,22 @@ else
                     <InputNumber id="price" @bind-Value="product.Price" min="0" step="0.01" class="form-control" />
                     <ValidationMessage For="() => product.Price" class="text-danger" />
                 </div>
+                <div class="mb-3">
+                    <label for="category">Categoria</label>
+                    <InputSelect id="category" @bind-Value="product.CategoryId" class="form-control">
+                        @foreach (var category in Categories)
+                        {
+                            <option value="@category.Id">@category.Name</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => product.CategoryId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="imageUpload" class="form-label @(ImageUploadMessage == ""?"":"text-danger")">
+                        @(ImageUploadMessage == "" ? "Upload Image" : ImageUploadMessage)
+                    </label>
+                    <InputFile id="imageUpload" @bind-Value="product.Image" OnChange="HandleImageUpload" class="form-control" multiple></InputFile>
+                </div>
                 <button type="submit" class="btn btn-primary">Guardar</button>
             </EditForm>
         </div>
@@ -56,7 +74,9 @@ else
 @code {
     [Parameter]
     public int Id { get; set; }
-
+    public List<Category> Categories { get; set; } = new();
+    ImageHelper imageHelper = new();
+    string ImageUploadMessage = "";
     public static string Url(Product product) =>
             $"products/edit/{Uri.EscapeDataString(product.Id.ToString())}";
 
@@ -64,7 +84,8 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        product = await Http.GetFromJsonAsync<Product>($"api/Products/{Id}");
+        Categories = await http.GetFromJsonAsync<List<Category>>("api/Categories");
+        product = await ProductService.GetProduct(Id);
 
         if (product is null)
         {
@@ -72,19 +93,17 @@ else
         }
     }
 
- 
-    private async void UpdateProduct()
-    {
-        var response = await Http.DeleteAsync($"api/Products/{Id}");
 
-        if (response.IsSuccessStatusCode)
-        {
-            navigationManager.NavigateTo("/products");
-        }
-        else
-        {
-            // Handle error
-            Console.WriteLine("Error deleting the product");
-        }
+    private async Task UpdateProduct()
+    {
+
+        await ProductService.UpdateProduct(product);
+        navigationManager.NavigateTo("/products");
+
+    }
+
+    async Task HandleImageUpload(InputFileChangeEventArgs e)
+    {
+        await imageHelper.HandleImageUpload(e, ImageUploadMessage, product);
     }
 }

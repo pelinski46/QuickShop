@@ -2,7 +2,7 @@
 @using QuickShop.Shared.Models
 @inject HttpClient Http
 @inject NavigationManager navigationManager
-
+@inject IProductService ProductService
 
 <PageTitle>Delete</PageTitle>
 
@@ -44,11 +44,11 @@
 
     Product? product;
 
-    
+
 
     protected override async Task OnInitializedAsync()
     {
-        product = await Http.GetFromJsonAsync<Product>($"api/Products/{Id}");
+        product = await ProductService.GetProduct(Id);
 
         if (product is null)
         {
@@ -58,16 +58,7 @@
 
     public async Task DeleteProduct()
     {
-        var response = await Http.DeleteAsync($"api/Products/{Id}");
-
-        if (response.IsSuccessStatusCode)
-        {
-            navigationManager.NavigateTo("/products");
-        }
-        else
-        {
-            // Handle error
-            Console.WriteLine("Error deleting the product");
-        }
+        await ProductService.DeleteProduct(Id);
+        navigationManager.NavigateTo("/products");
     }
 }

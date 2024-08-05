@@ -1,5 +1,6 @@
 ﻿@page "/products"
 @using Microsoft.AspNetCore.Components.QuickGrid
+@inject IProductService ProductService
 @using QuickShop.Shared.Models
 @inject HttpClient Http
 
@@ -12,15 +13,15 @@
 </p>
 
 <QuickGrid Class="table" Items="@products" Pagination="pagination">
-    <PropertyColumn Property="product => product.Title" Title="Nombre" />
-    <PropertyColumn Property="product => product.Description" Title="Descripción"/>
-    <PropertyColumn Property="product => product.quantity" Title="Cantidad" />
-    <PropertyColumn Property="product => product.Price" Title="Precio" />
-    <TemplateColumn Context="product">
+    <Microsoft.AspNetCore.Components.QuickGrid.PropertyColumn Property="product => product.Title" Title="Nombre" />
+    <Microsoft.AspNetCore.Components.QuickGrid.PropertyColumn Property="product => product.Description" Title="Descripción" />
+    <Microsoft.AspNetCore.Components.QuickGrid.PropertyColumn Property="product => product.quantity" Title="Cantidad" />
+    <Microsoft.AspNetCore.Components.QuickGrid.PropertyColumn Property="product => product.Price" Title="Precio" />
+    <Microsoft.AspNetCore.Components.QuickGrid.TemplateColumn Context="product">
         <a href="@Edit.Url(product)">Editar</a> |
         <a href="@Details.Url(product)">Detalles</a> |
         <a href="@Delete.Url(product)">Eliminar</a>
-    </TemplateColumn>
+    </Microsoft.AspNetCore.Components.QuickGrid.TemplateColumn>
 </QuickGrid>
 
 <Paginator State="pagination" />
@@ -29,7 +30,7 @@
     IQueryable<Product>? products;
     protected override async Task OnInitializedAsync()
     {
-        products = Queryable.AsQueryable( await Http.GetFromJsonAsync<List<Product>>("api/Products"));
+        products = Queryable.AsQueryable(await ProductService.GetProducts());
     }
-    PaginationState pagination = new() { ItemsPerPage = 10 };
+    Microsoft.AspNetCore.Components.QuickGrid.PaginationState pagination = new() { ItemsPerPage = 10 };
 }
