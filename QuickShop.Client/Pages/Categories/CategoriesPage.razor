@@ -38,7 +38,9 @@
 
     public async Task CategoryClicked(int categoryId)
     {
+        CategoryId = categoryId;
         await CategoryClickedEvent.InvokeAsync(categoryId);
+
     }
 
     public async void DefaultCategoryClicked()

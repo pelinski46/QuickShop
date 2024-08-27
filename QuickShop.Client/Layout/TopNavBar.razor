@@ -1,9 +1,14 @@
+@using Microsoft.AspNetCore.Authorization
+@using QuickShop.Client.Authentication
+@using QuickShop.Client.Services
 @inject NavigationManager navigationManager
+@inject AuthenticationStateProvider authStateProvider
+
 
 
 <div class="container">
-    <header class="d-flex justify-content-between flex-wrap py-3">
-        <NavLink href="/" class="text-light text-decoration-none fs-4 fw-bold">Urban Indumentaria</NavLink>
+    <header class="d-flex py-3 text-lg-start">
+        <NavLink href="/" class="text-light text-decoration-none fs-2 fw-bold">Urban Indumentaria</NavLink>
         <ul class="nav">
             <li>
                 <NavLink href="/" class="link-light nav-link">Inicio</NavLink>
@@ -12,19 +17,36 @@
                 <NavLink href="/store" class="link-light nav-link">Productos</NavLink>
             </li>
             <li>
-                <NavLink href="/products" class="link-light nav-link">Oferta</NavLink>
+              <AuthorizeView Roles="Admin">
+                    <NavLink href="/products" class="link-light nav-link">Administrador</NavLink>
+              </AuthorizeView> 
             </li>
             
         </ul>   
         <div class="text-end">
-            <FluentButton IconStart="@(new Icons.Regular.Size20.Cart())" Appearance="Appearance.Accent" BackgroundColor="#0584f7" Style=" padding: 5px; height: 35px">Carrito</FluentButton>
-            <FluentButton IconStart="@(new Icons.Regular.Size20.Person())" Appearance="Appearance.Accent" BackgroundColor="#0584f7" Style="padding: 5px; height: 34px" OnClick="GoToLogIn">Iniciar Sesi�n</FluentButton>
-            <FluentButton IconStart="@(new Icons.Regular.Size20.PersonAdd())" Appearance="Appearance.Accent" BackgroundColor="#0584f7" Style="padding: 5px;height: 34px" OnClick="GoToRegister">Registrarse</FluentButton>
+            <AuthorizeView>
+                <Authorized>
+                    <div class="text-end">
+                        <span class="fw-bold text-primary">@context.User.Identity!.Name</span>
+                        <FluentButton IconStart="@(new Icons.Regular.Size24.Cart())" Appearance="Appearance.Accent" BackgroundColor="#0584f7" Style=" padding: 5px; height: 40px" OnClick="GoToCart">Carrito</FluentButton>
+                        <FluentButton IconStart="@(new Icons.Regular.Size24.DismissCircle())" Appearance="Appearance.Accent" BackgroundColor="#ff0000" Style=" padding: 5px; height: 40px" OnClick="LogOut">Cerrar Sesión</FluentButton>
+                    </div>
+                </Authorized>
+                <NotAuthorized>
+                    <FluentButton IconStart="@(new Icons.Regular.Size24.Cart())" Appearance="Appearance.Accent" BackgroundColor="#0584f7" Style=" padding: 5px; height: 40px">Carrito</FluentButton>
+                    <FluentButton IconStart="@(new Icons.Regular.Size24.Person())" Appearance="Appearance.Accent" BackgroundColor="#0584f7" Style="padding: 5px; height: 40px" OnClick="GoToLogIn">Iniciar Sesión</FluentButton>
+                    <FluentButton IconStart="@(new Icons.Regular.Size24.PersonAdd())" Appearance="Appearance.Accent" BackgroundColor="#0584f7" Style="padding: 5px;height: 40px" OnClick="GoToRegister">Registrarse</FluentButton>
+                </NotAuthorized>
+            </AuthorizeView>
         </div>
     </header>
 </div>
+
 @code {
 
+   
+
+    
     public void GoToCart()
     {
         navigationManager.NavigateTo("/cart");
@@ -36,6 +58,15 @@
     public void GoToRegister()
     {
         navigationManager.NavigateTo("/register");
+    }
+
+    
+
+    public async Task LogOut()
+    {
+        var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
+        await customAuthStateProvider.UpdateAuthenticationState(null!);
+        navigationManager.NavigateTo("/store", replace: true);
     }
 
 }

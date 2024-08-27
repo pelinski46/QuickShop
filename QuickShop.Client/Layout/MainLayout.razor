@@ -1,11 +1,19 @@
 ﻿@inherits LayoutComponentBase
 <PageTitle>Urban Indumentaria</PageTitle>
 
-<div class="page d-flex flex-column">
-    <div class="container-fluid" style="background-color:rebeccapurple">
-        <TopNavBar />
+<main>
+    <div class="page d-flex flex-column">
+        <FluentHeader class="container-fluid" Style="background-color:rebeccapurple; height:auto">
+            <TopNavBar />
+        </FluentHeader>
+        <div class="container-fluid flex-grow-1" style="padding:15px;">
+            @Body
+        </div>
     </div>
-    <div class="container-fluid flex-grow-1" style="padding:15px;">
-        @Body
-    </div>
-</div>
+
+    <FluentToastProvider />
+    <FluentDialogProvider />
+    <FluentTooltipProvider />
+    <FluentMessageBarProvider />
+
+</main>

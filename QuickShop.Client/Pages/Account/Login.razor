@@ -49,6 +49,7 @@
 
     private async Task HandleLogin()
     {
+        
         Message = string.Empty;
         var response = await httpClient.PostAsJsonAsync("login", LoginUser);
         if (!response.IsSuccessStatusCode)

@@ -1,0 +1,102 @@
+﻿@page "/cart"
+@using System.Security.Claims
+@using QuickShop.Client.Authentication
+@inject ICartItemService CartService
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider authStateProvider
+@inject IProductService ProductService
+<PageTitle>Carrito</PageTitle>
+
+<h3>Carrito de Compras</h3>
+
+@if (cartProducts == null || cartProducts.Count == 0)
+{
+    <span>@message</span>
+}
+else
+{
+    <AuthorizeView>
+        <Authorized>
+            <div class="product-container">
+                @foreach (var cartItem in cartProducts)
+                {
+                    var product = products.FirstOrDefault(p => p.Id == cartItem.ProductId);
+                    <div class="cart-card">
+                        <div class="set-bg">
+                            <img src="@product.Image" />
+                        </div>
+                        <h5><a href="/products/details/@cartItem.ProductId">@product.Title</a></h5>
+                        <input type="number" value="@cartItem.Quantity" @oninput="@((ChangeEventArgs e) => UpdateQuantity(e, cartItem))" class="form-control input-quantity" min="1" />
+                        <div class="cart-product-price">
+                            $@(product.Price * cartItem.Quantity)
+                        </div>
+                        <button class="btn-delete" @onclick="@(() => RemoveProductFromCart(cartItem))">
+                            Eliminar Producto
+                        </button>
+                    </div>
+                }
+            </div>
+            <footer class="cart-total">
+                <span>Total (@cartProducts.Count):</span>
+                <span class="total-amount">$@cartProducts.Sum(cartItem =>
+                {
+                    var product = products.FirstOrDefault(p => p.Id == cartItem.ProductId);
+                    return product != null ? product.Price * cartItem.Quantity : 0;
+                })</span>
+            </footer>
+        </Authorized>
+    </AuthorizeView>
+}
+
+
+
+@code {
+    List<CartItem>? cartProducts;
+    List<Product>? products;
+    string message = "No hay productos cargados en su carrito";
+
+    private string? userId;
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await authStateProvider.GetAuthenticationStateAsync();
+        userId = authState.User.Identity!.Name;
+        cartProducts = await CartService.GetCartItems(userId!);
+        products = await ProductService.GetProducts();
+
+    }
+
+    public async void UpdateQuantity(ChangeEventArgs eventArgs, CartItem cartItem)
+    {
+        if (eventArgs.Value is not null && int.TryParse(eventArgs.Value.ToString(), out int newQuantity))
+        {
+            if (newQuantity < 1)
+            {
+                newQuantity = 1;
+            }
+            cartItem.Quantity = newQuantity;
+            var authState = await authStateProvider.GetAuthenticationStateAsync();
+            userId = authState.User.Identity!.Name;
+
+            await CartService.UpdateCartItem(cartItem, userId!);
+            StateHasChanged();
+        }
+    }
+
+    public async void RemoveProductFromCart(CartItem cartItem)
+    {
+        await CartService.RemoveCartItem(cartItem.Id);
+        cartProducts.Remove(cartItem);
+        StateHasChanged();
+    }
+
+}
+<style>
+    .set-bg img {
+        width: 100px;
+        height: 100px;
+        /* Ensure all images are the same height */
+        object-fit: fill;
+        /* Cover the container without distortion */
+        display: block;
+    }
+</style>

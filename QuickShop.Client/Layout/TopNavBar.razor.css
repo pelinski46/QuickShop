@@ -1,0 +1,153 @@
+/* Container for the header */
+.container {
+    background-color: inherit;
+    padding: 15px 20px;
+    border-bottom: 2px solid #444;
+}
+
+/* Header styling */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Brand title styling */
+.fs-2 {
+    color: white;
+    transition: color 0.3s ease;
+}
+
+.fs-2:hover {
+    color: #0584f7;
+}
+
+/* Nav container to center the nav links */
+.nav-container {
+    display: flex;
+    flex: 1;
+    /* Allow nav to take available space */
+    justify-content: center;
+    /* Center nav items horizontally */
+    align-items: center;
+    /* Align nav items vertically */
+}
+
+/* Nav links styling */
+.nav {
+    list-style-type: none;
+    display: flex;
+    padding-left: 0;
+    margin: 0;
+    align-items: center;
+}
+
+.nav-link {
+    color: white;
+    font-size: 1.1rem;
+    transition: color 0.3s ease;
+    position: relative;
+    padding: 5px 10px;
+    display: flex;
+    align-items: center;
+}
+
+/* Underline effect on hover */
+.nav-link::after {
+    content: "";
+    position: absolute;
+    width: 0%;
+    height: 2px;
+    background-color: #0584f7;
+    left: 0;
+    bottom: -5px;
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #0584f7;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+/* User action buttons container */
+.text-end {
+    display: flex;
+    align-items: center;
+    /* Increased gap for better spacing */
+}
+
+/* Username styling */
+.fw-bold.text-primary {
+    color: white;
+    margin-right: 10px;
+    font-size: 1.1rem;
+}
+
+/* Buttons styling */
+fluent-button {
+    border-radius: 5px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease-in-out, background-color 0.3s ease;
+    color: white;
+    padding: 8px 16px;
+    /* Adjusted padding for better click area */
+    font-size: 0.9rem;
+    /* Adjusted font size */
+}
+
+/* Hover effect */
+fluent-button:hover {
+    transform: translateY(-2px);
+    background-color: #0366d6;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .nav-container {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    .nav {
+        flex-direction: column;
+        width: 100%;
+        margin-top: 10px;
+        /* Add margin to separate nav links from other elements */
+    }
+
+    .nav-link {
+        padding: 10px;
+        width: 100%;
+        text-align: left;
+    }
+
+    .text-end {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        /* Stack buttons vertically */
+        align-items: flex-start;
+        gap: 10px;
+        /* Space between buttons */
+        margin-top: 15px;
+    }
+
+    fluent-button {
+        width: 100%;
+        /* Full width for easier tapping */
+        margin-top: 0;
+        /* Remove extra margin on mobile */
+        text-align: center;
+        /* Center text within the button */
+    }
+}

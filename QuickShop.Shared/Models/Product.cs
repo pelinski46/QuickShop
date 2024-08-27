@@ -13,4 +13,5 @@ public class Product
     public int CategoryId { get; set; }
     public virtual Category? Category { get; set; }
     public string? Image {  get; set; }
+    public virtual ICollection<CartItem>? CartItems { get; set; }
 }

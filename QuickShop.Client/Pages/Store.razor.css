@@ -1,0 +1,38 @@
+﻿
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px; /* Increase the gap for more separation */
+}
+
+.layout {
+    display: flex;
+    flex-direction: row;
+    width: 100%; /* Ensure the layout takes up the full width */
+}
+
+.card {
+    padding: 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}
+
+.categories {
+    flex: 1 1 20%; /* Make the categories page narrower */
+}
+
+.products {
+    flex: 1 1 75%; /* Make the product page wider */
+}
+
+@media (max-width: 1080px) and (min-width: 769px) {
+    .layout {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 768px) {
+    .layout {
+        flex-direction: column;
+    }
+}

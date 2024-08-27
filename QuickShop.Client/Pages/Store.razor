@@ -1,20 +1,19 @@
 ﻿@page "/store"
 @inject HttpClient http
 @inject IProductService ProductService
-<div class="container-fluid">
-    <div class="row">
-        <FluentCard Style="width: 20%;">
+
+    <div class="layout" style="gap:30px;">
+        <div class="card categories">
             <CategoriesPage CategoryClickedEvent="CategoryClickedEvent" DefaultCategoryClickedEvent="DefaultCategoryClickedEvent" />
-        </FluentCard>
-        <FluentCard Style="width: 78%;">
+        </div>
+        <div class="card products" style="width: auto;">
             <ProductPage products="productsbycategory?? products" />
-        </FluentCard>
+        </div>
     </div>
-</div>
 
 
 
-
+    
 @code 
 {
     public List<Product>? products;

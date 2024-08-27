@@ -9,6 +9,7 @@ public class QuickShopServerContext : IdentityDbContext
 {
     public DbSet<Product> Products { get; set; } = default!;
     public DbSet<Category> Categories { get; set; } = default!;
+    public DbSet<CartItem> CartItems { get; set; } = default!;
     public QuickShopServerContext(DbContextOptions<QuickShopServerContext> options)
         : base(options)
     {
@@ -21,8 +22,14 @@ public class QuickShopServerContext : IdentityDbContext
         base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<Category>()
             .HasMany(c => c.Products)
-            .WithOne(c => c.Category)
-            .HasForeignKey(c => c.CategoryId)
+            .WithOne(p => p.Category)
+            .HasForeignKey(p => p.CategoryId)
+            .IsRequired();
+
+        modelBuilder.Entity<CartItem>()
+            .HasOne(ci=>ci.Product)
+            .WithMany(p=>p.CartItems)
+            .HasForeignKey(ci => ci.ProductId)
             .IsRequired();
 
     }

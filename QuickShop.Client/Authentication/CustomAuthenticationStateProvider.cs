@@ -8,11 +8,13 @@ namespace QuickShop.Client.Authentication
     public class CustomAuthenticationStateProvider : AuthenticationStateProvider
     {
         private readonly ILocalStorageService localStorageService;
+        private readonly HttpClient _httpClient;
         private ClaimsPrincipal anonymous = new ClaimsPrincipal(new ClaimsIdentity());
 
-        public CustomAuthenticationStateProvider(ILocalStorageService localStorageService)
+        public CustomAuthenticationStateProvider(ILocalStorageService localStorageService, HttpClient httpClient)
         {
             this.localStorageService = localStorageService;
+            this._httpClient = httpClient;
         }
         public async override Task<AuthenticationState> GetAuthenticationStateAsync()
         {
@@ -20,7 +22,8 @@ namespace QuickShop.Client.Authentication
             {
                 var authenticationModel = await localStorageService.GetItemAsStringAsync("Authentication");
                 if (authenticationModel == null) { return await Task.FromResult(new AuthenticationState(anonymous)); }
-                return await Task.FromResult(new AuthenticationState(SetClaims(Deserialize(authenticationModel).Username!)));
+                var model = Deserialize(authenticationModel);
+                return await Task.FromResult(new AuthenticationState(SetClaims(model.Username!)));
             }
             catch
             {
@@ -53,10 +56,29 @@ namespace QuickShop.Client.Authentication
 
         }
 
-        private ClaimsPrincipal SetClaims(string email) => new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
+        private ClaimsPrincipal SetClaims(string username)
         {
-            new Claim(ClaimTypes.Name, email)
-        }, "CustomAuth"));
+            var roles = new List<string>();
+            if (username == "admin@admin.com"){
+                roles = new List<string> { "Admin", "User" };
+            }else {
+                roles = new List<string> {"User"};
+            }
+            
+            var claims = new List<Claim>
+                {
+                     new Claim(ClaimTypes.Name, username)
+                };
+
+            if (roles != null)
+            {
+                claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+            }
+
+            return new ClaimsPrincipal(new ClaimsIdentity(claims, "CustomAuth"));
+        }
+
+
         private AuthenticationModel Deserialize(string serializeString) => JsonSerializer.Deserialize<AuthenticationModel>(serializeString)!;
         private string Serialize(AuthenticationModel model) => JsonSerializer.Serialize(model);
 
